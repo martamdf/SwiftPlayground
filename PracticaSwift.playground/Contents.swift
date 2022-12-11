@@ -70,7 +70,6 @@ var playersFiltered2 = players.filter { player in
     return regex2?.firstMatch(in: player, options:[], range: range2) != nil
     }
 print(playersFiltered2)
-print(players)
 
 
 
@@ -100,11 +99,10 @@ class StaffMember {
     }
 }
 
-// Puede ser que no sea necesaria... revisar
 class Player : StaffMember {
-    var posicion : PlayerPosition
-    init(name: String, type: MemberType, posicion: PlayerPosition) {
-        self.posicion = posicion
+    var position : PlayerPosition
+    init(name: String, type: MemberType, position: PlayerPosition) {
+        self.position = position
         super.init(type: type)
     }
 }
@@ -126,7 +124,7 @@ let nombresGrupos = ["A", "B", "C", "D", "E", "F", "G", "H"]
 // Clase Mundial
 class WorldCup {
     var groups = [Group]()
-    var selecciones = [Team]()
+    var teams = [Team]()
     
     init (teamsStr: [String]){
         var listStr = teamsStr
@@ -134,7 +132,7 @@ class WorldCup {
         // Aquí creo la lista de selecciones
         for element in teamsStr {
             var equipo = Team(name: element)
-            self.selecciones.append(equipo)
+            self.teams.append(equipo)
         }
         
         listStr.shuffle()
@@ -151,7 +149,7 @@ class WorldCup {
     func getGroups(){
         groups.forEach { group in
             print(group.name.uppercased())
-            group.equipos.forEach { team in
+            group.teams.forEach { team in
                 print(team.name)
             }
         }
@@ -163,13 +161,12 @@ class Team {
     var name: String // propiedad pública
     var country: String = ""
     var players = [Player]()// propiedad pública
-    var seleccionador: StaffMember
+    var teamManager: StaffMember
     var clasification = 0
-    
     
     init(name: String) {
         self.name = name
-        self.seleccionador = StaffMember(type: MemberType.seleccionador)
+        self.teamManager = StaffMember(type: MemberType.seleccionador)
     }
 }
 
@@ -182,12 +179,12 @@ class Match {
     var visitorTeam: Team
     var goalsLocalTeam: Int = 0// propiedad pública
     var goalsVisitorTeam: Int = 0//
-    var resultado = ""
+    var result = ""
     
     init(teamNameA: Team, teamName2: Team) {
-        localTeam = teamNameA
-        visitorTeam = teamName2
-        resultado = playMatch()
+        self.localTeam = teamNameA
+        self.visitorTeam = teamName2
+        self.result = playMatch()
     }
     
     func playMatch() -> String{
@@ -224,7 +221,7 @@ while teamsCopy.count > 1{
 }
 print("------------")
 matchList.forEach { match in
-    print(match.resultado)
+    print(match.result)
 }
 
 
@@ -233,22 +230,22 @@ matchList.forEach { match in
 
 class Group {
     var name : String
-    var equipos = [Team]()
-    var partidos = [Match]()
+    var teams = [Team]()
+    var matches = [Match]()
     
     init(name : String, teamA: Team, teamB: Team, teamC: Team, teamD: Team) {
         self.name = name
-        self.equipos.append(teamA)
-        self.equipos.append(teamB)
-        self.equipos.append(teamC)
-        self.equipos.append(teamD)
+        self.teams.append(teamA)
+        self.teams.append(teamB)
+        self.teams.append(teamC)
+        self.teams.append(teamD)
         
         var teamsAlreadyIn = [String]()
-        self.equipos.enumerated().forEach { index, team in
-            self.equipos.forEach { otherTeam in
+        self.teams.enumerated().forEach { index, team in
+            self.teams.forEach { otherTeam in
                 if (team.name != otherTeam.name){
                     if !teamsAlreadyIn.contains(otherTeam.name) {
-                        partidos.append(Match(teamNameA: team, teamName2: otherTeam))
+                        matches.append(Match(teamNameA: team, teamName2: otherTeam))
                     }
                 }
             }
@@ -256,9 +253,9 @@ class Group {
         }
     }
     
-    func getListaPartidos() {
+    func getMatchesList() {
         print("-------------")
-        self.partidos.forEach { match in
+        self.matches.forEach { match in
             print("partido: \(match.localTeam) - \(match.visitorTeam)")
         }
         print("-------------")
@@ -269,8 +266,8 @@ class Group {
     func get2Classificates(teams: [Team]) {
         var classificated = [Team]()
         
-        var kk = teams.sorted(by: { $0.clasification > $1.clasification })
-        classificated.append(contentsOf: [kk[0], kk[1]])
+        var qualified = teams.sorted(by: { $0.clasification > $1.clasification })
+        classificated.append(contentsOf: [qualified[0], qualified[1]])
         print ("Ganadores: ", classificated[0].name, "Puntuación: ",classificated[0].clasification, " - ", classificated[1].name, "Puntuación: ", classificated[1].clasification)
     }
 
@@ -281,20 +278,20 @@ var mundial2022 = WorldCup(teamsStr: teams)
 
 mundial2022.groups.forEach { group in
     print(group.name, " RESULTADO PARTIDOS ------------------")
-    group.partidos.forEach { team in
-        print(team.resultado)
+    group.matches.forEach { team in
+        print(team.result)
     }
     
     // MARK: -EJERCICIO 9-
     // 9.- Para añadir a cada Grupo los puntos de cada selección habrá que contabilizar las victorias con 3 puntos, empates con 1 y derrotas con 0. Añadir una función en la clase Grupo que le pasemos una selección y nos devuelva sus puntos.
     print("\(group.name) CLASIFICACIÓN --------------")
-    group.equipos.forEach { team in
+    group.teams.forEach { team in
         print(team.name, group.getPunctuation(team: team))
     }
     
     // MARK: -EJERCICIO 10-
     // 10.- Generar los partidos del Mundial en cada grupo y calcular las dos primeras selecciones de cada grupo y hacer un print con los clasificados.
     print("\(group.name) CLASIFICADOS ---------------")
-    group.get2Classificates(teams: group.equipos)
+    group.get2Classificates(teams: group.teams)
 }
 
