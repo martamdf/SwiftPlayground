@@ -1,3 +1,3 @@
-# Práctica iOS Swift
+# Práctica Swift
 
 #### Resolución de Ejercicio Práctico propuesto en el módulo de Swift.
